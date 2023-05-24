@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Listing from "../components/Listing";
-import { createClient } from "urql";
+import { createClient, fetchExchange } from "urql";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
 import { SUBGRAPH_URL } from "../constants";
@@ -34,6 +34,7 @@ export default function Home() {
     // Create a urql client
     const urqlClient = createClient({
       url: SUBGRAPH_URL,
+      exchanges: [fetchExchange]
     });
 
     // Send the query to the subgraph GraphQL API, and get the response
@@ -41,7 +42,6 @@ export default function Home() {
     const listingEntities = response.data.listingEntities;
     // Filter out active listings i.e. ones which haven't been sold yet
     const activeListings = listingEntities.filter((l) => l.buyer === null);
-
     // Update state variables
     setListings(activeListings);
     setLoading(false);

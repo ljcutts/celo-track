@@ -2,41 +2,16 @@ import "@rainbow-me/rainbowkit/styles.css";
 import "../styles/globals.css";
 
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { publicProvider } from "wagmi/providers/public";
+import { createConfig, WagmiConfig, configureChains } from "wagmi";
+import { createPublicClient, http } from "viem";
+import { celoAlfajores } from "@wagmi/core/chains";
 
 
-const celoChain = {
-  id: 44787,
-  name: "Celo Alfajores Testnet",
-  network: "alfajores",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Celo",
-    symbol: "CELO",
-  },
-  rpcUrls: {
-    default: "https://alfajores-forno.celo-testnet.org",
-  },
-  blockExplorers: {
-    default: {
-      name: "CeloScan",
-      url: "https://alfajores.celoscan.io",
-    },
-  },
-  testnet: true,
-};
 
-const { chains, provider } = configureChains(
-  [celoChain],
-  [
-    jsonRpcProvider({
-      rpc: (chain) => {
-        if (chain.id !== celoChain.id) return null;
-        return { http: chain.rpcUrls.default };
-      },
-    }),
-  ]
+const { chains } = configureChains(
+  [celoAlfajores],
+  [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
@@ -44,15 +19,19 @@ const { connectors } = getDefaultWallets({
   chains,
 });
 
-const wagmiClient = createClient({
+
+const config = createConfig({
   autoConnect: true,
-  connectors,
-  provider,
+  publicClient: createPublicClient({
+    chain: celoAlfajores,
+    transport: http()
+  }),
+  connectors
 });
 
 function MyApp({ Component, pageProps }) {
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={config}>
       <RainbowKitProvider chains={chains}>
         <Component {...pageProps} />
       </RainbowKitProvider>

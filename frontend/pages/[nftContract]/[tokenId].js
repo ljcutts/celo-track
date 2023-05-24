@@ -2,7 +2,7 @@ import { Contract } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { createClient } from "urql";
+import { createClient, fetchExchange } from "urql";
 import { useContract, useSigner, erc721ABI } from "wagmi";
 import MarketplaceABI from "../../abis/NFTMarketplace.json";
 import Navbar from "../../components/Navbar";
@@ -53,7 +53,10 @@ export default function NFTDetails() {
 }
     `;
 
-    const urqlClient = createClient({ url: SUBGRAPH_URL });
+   const urqlClient = createClient({
+     url: SUBGRAPH_URL,
+     exchanges: [fetchExchange],
+   });
 
     // Send the query to the subgraph GraphQL API, and get the response
     const response = await urqlClient.query(listingQuery).toPromise();
@@ -87,7 +90,7 @@ export default function NFTDetails() {
     const metadataJSON = await metadata.json();
 
     let image = metadataJSON.imageUrl;
-    image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
+    // image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
 
     setName(metadataJSON.name);
     setImageURI(image);

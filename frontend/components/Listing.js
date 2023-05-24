@@ -16,8 +16,8 @@ export default function Listing(props) {
   const provider = useProvider();
   const { address } = useAccount();
   const ERC721Contract = useContract({
-    addressOrName: props.nftAddress,
-    contractInterface: erc721ABI,
+    address: props.nftAddress,
+    abi: erc721ABI,
     signerOrProvider: provider,
   });
 
@@ -40,7 +40,7 @@ export default function Listing(props) {
       let image = metadataJSON.imageUrl;
       // If it's an IPFS URI, replace it with an HTTP Gateway link
       image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
-
+      console.log(image)
       // Update state variables
       setName(metadataJSON.name);
       setImageURI(image);
@@ -54,6 +54,7 @@ export default function Listing(props) {
   // Fetch the NFT details when component is loaded
   useEffect(() => {
     fetchNFTDetails();
+    console.log(props.nftAddress)
   }, []);
 
   return (
